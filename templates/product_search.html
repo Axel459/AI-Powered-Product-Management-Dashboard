@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Search - Product Management Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        .card-3d {
+            transform-style: preserve-3d;
+            transition: all 0.3s ease;
+        }
+        .card-3d:hover {
+            transform: translateY(-10px) rotateX(4deg);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #3b82f6 0%, #2dd4bf 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .search-card {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+        }
+        .search-card:focus-within {
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+        .suggestion-item {
+            transition: all 0.2s ease;
+        }
+        .suggestion-item:hover {
+            background: linear-gradient(to right, rgba(59, 130, 246, 0.1), rgba(45, 212, 191, 0.1));
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-50">
+    <nav class="fixed w-full z-50 bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="/" class="text-xl font-bold gradient-text">Product Dashboard</a>
+                <div class="space-x-8">
+                    <a href="/product-search" class="text-blue-600">Product Search</a>
+                    <a href="/company-search" class="text-gray-600 hover:text-blue-600">Company Search</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-slate-900/50 hidden flex items-center justify-center z-50 backdrop-blur-sm">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl text-center max-w-md w-full mx-4">
+            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500 mx-auto mb-4"></div>
+            <h2 class="text-2xl font-bold mb-2 text-gray-800">Analyzing Product Reviews</h2>
+            <p class="text-gray-600 mb-2">Please wait while we generate insights...</p>
+            <p class="text-sm text-gray-500">This process may take up to 3 minutes</p>
+        </div>
+    </div>
+
+    <main class="pt-32 pb-12 px-4">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold mb-4 gradient-text">Product Search</h1>
+                <p class="text-xl text-gray-600">Generate detailed customer driven product development insights for any product*</p>
+                <p class="text-sm text-gray-500 italic">*This demo is restricted to electronics products popular in 2023</p>
+            </div>
+
+            <div class="search-card bg-white rounded-xl shadow-lg p-6 mb-8">
+                <input
+                    type="text"
+                    id="product-search-input"
+                    placeholder="Enter product name"
+                    class="w-full px-4 py-3 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                >
+                <div
+                    id="suggestions-container"
+                    class="absolute z-10 mt-2 w-full max-w-2xl bg-white rounded-lg shadow-lg overflow-hidden hidden border border-gray-100"
+                >
+                    <!-- Suggestions will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('product-search-input');
+            const suggestionsContainer = document.getElementById('suggestions-container');
+            const loadingOverlay = document.getElementById('loading-overlay');
+
+            searchInput.addEventListener('input', async (e) => {
+                const query = e.target.value;
+
+                if (query.length < 2) {
+                    suggestionsContainer.innerHTML = '';
+                    suggestionsContainer.classList.add('hidden');
+                    return;
+                }
+
+                try {
+                    const response = await axios.get(`/get-product-suggestions?query=${encodeURIComponent(query)}`);
+                    const suggestions = response.data;
+
+                    suggestionsContainer.innerHTML = '';
+                    suggestionsContainer.classList.remove('hidden');
+
+                    if (suggestions.length === 0) {
+                        suggestionsContainer.innerHTML = `
+                            <div class="p-4 text-gray-500 text-center">No suggestions found</div>
+                        `;
+                        return;
+                    }
+
+                    suggestions.forEach(suggestion => {
+                        const suggestionElement = document.createElement('div');
+                        suggestionElement.textContent = suggestion;
+                        suggestionElement.classList.add(
+                            'suggestion-item',
+                            'p-4',
+                            'cursor-pointer',
+                            'text-gray-700',
+                            'hover:text-blue-600',
+                            'border-b',
+                            'last:border-b-0'
+                        );
+
+                        suggestionElement.addEventListener('click', () => {
+                            handleProductSelection(suggestion);
+                        });
+
+                        suggestionsContainer.appendChild(suggestionElement);
+                    });
+                } catch (error) {
+                    console.error('Error fetching suggestions:', error);
+                }
+            });
+
+            async function handleProductSelection(suggestion) {
+                loadingOverlay.classList.remove('hidden');
+                console.log('Starting analysis for:', suggestion);
+
+                try {
+                    const response = await axios.post('/start-analysis', {
+                        product_title: suggestion
+                    });
+
+                    const taskId = response.data.task_id;
+                    console.log('Received task ID:', taskId);
+
+                    let attempts = 0;
+                    const maxAttempts = 90;
+
+                    while (attempts < maxAttempts) {
+                        console.log('Checking status, attempt:', attempts + 1);
+                        const statusResponse = await axios.get(`/check-analysis-status/${taskId}`);
+                        console.log('Status response:', statusResponse.data);
+
+                        if (statusResponse.data.status === 'completed') {
+                            console.log('Analysis completed, redirecting...');
+                            window.location.href = `/product-insights/${encodeURIComponent(suggestion)}`;
+                            break;
+                        } else if (statusResponse.data.status === 'failed') {
+                            throw new Error(statusResponse.data.error || 'Analysis failed');
+                        }
+
+                        attempts++;
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                    }
+
+                    if (attempts >= maxAttempts) {
+                        throw new Error('Analysis timeout');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert(error.message || 'An error occurred. Please try again.');
+                    loadingOverlay.classList.add('hidden');
+                }
+            }
+
+            document.addEventListener('click', (e) => {
+                if (!suggestionsContainer.contains(e.target) && e.target !== searchInput) {
+                    suggestionsContainer.classList.add('hidden');
+                }
+            });
+        });
+    </script>
+
+    <footer class="fixed bottom-0 w-full bg-white shadow-lg-up py-4">
+        <p class="text-center text-gray-600">© 2024 Product Management Dashboard</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Insights - {{ company_url }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Base Styles */
+        .card-3d {
+            transform-style: preserve-3d;
+            transition: all 0.3s ease;
+        }
+        .card-3d:hover {
+            transform: translateY(-5px) rotateX(2deg);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #3b82f6 0%, #2dd4bf 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .review-card {
+            transition: transform 0.2s ease;
+        }
+        .review-card:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Analysis Content */
+        .analysis-content {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #374151;
+        }
+        .analysis-content strong {
+            font-weight: 600;
+            color: #111827;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        .analysis-content p {
+            margin-bottom: 1rem;
+        }
+
+        /* Metadata Grid */
+        .metadata-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .metadata-item {
+            background-color: white;
+            padding: 1.75rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+        }
+
+        .metadata-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-color: rgba(59, 130, 246, 0.2);
+        }
+
+        .metadata-label {
+            color: #6366f1;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+        }
+
+        .metadata-value {
+            color: #1f2937;
+            font-size: 1.100rem;
+            line-height: 1.5;
+            font-weight: 400;
+        }
+
+        /* Analysis Sections */
+        .analysis-section {
+            margin-bottom: 2rem;
+        }
+        .section-intro {
+            color: #4b5563;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        /* Strengths and Challenges */
+        .strength-item, .challenge-item {
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            background-color: #f8fafc;
+            border-radius: 0.75rem;
+            transition: transform 0.2s ease;
+            border: 1px solid #e5e7eb;
+        }
+        .strength-item:hover, .challenge-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .strength-title, .challenge-title {
+            color: #1e40af;
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        /* Customer Quotes */
+        blockquote {
+            margin: 1rem 0;
+            padding: 1.25rem;
+            background-color: #f8fafc;
+            border-left: 4px solid #3b82f6;
+            border-radius: 0.5rem;
+            font-style: italic;
+            color: #4b5563;
+            line-height: 1.6;
+        }
+        blockquote:hover {
+            background-color: #f1f5f9;
+        }
+
+        /* Strategic Recommendations */
+        .strategy-section {
+            margin-top: 2rem;
+        }
+
+        .strategy-intro {
+            font-size: 1.1rem;
+            color: #374151;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .strategy-item {
+            background-color: #f8fafc;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            margin-bottom: 2rem;
+            border: 1px solid #e5e7eb;
+        }
+
+        .strategy-heading {
+            color: #1e40af;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .strategy-description {
+            color: #374151;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .implementation-section,
+        .outcomes-section {
+            margin-top: 1.5rem;
+        }
+
+        .implementation-section h4,
+        .outcomes-section h4 {
+            color: #1e40af;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .implementation-steps {
+            list-style-type: decimal;
+            padding-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .implementation-steps li {
+            margin-bottom: 1rem;
+            color: #374151;
+        }
+
+        .implementation-steps strong {
+            color: #1e40af;
+        }
+
+        .outcome-list {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+            color: #374151;
+        }
+
+        .outcome-list li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Stats Card */
+        .stats-card {
+            background-color: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            text-align: center;
+        }
+        .stats-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+        .stats-value {
+            color: #111827;
+            font-size: 1.875rem;
+            font-weight: 700;
+        }
+        .stats-sublabel {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Responsive handling */
+
+        @media (max-width: 1280px) {
+            .metadata-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .metadata-grid {
+                grid-template-columns: 1fr;
+            }
+            .max-w-6xl {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+        }
+        /* Additional Typography */
+        h1, h2, h3, h4 {
+            color: #111827;
+            line-height: 1.4;
+        }
+
+        /* Utility Classes */
+        .prose {
+            max-width: none;
+        }
+        .prose > * {
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-50">
+    <nav class="fixed w-full z-50 bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="/" class="text-xl font-bold gradient-text">Product Dashboard</a>
+                <div class="space-x-8">
+                    <a href="/product-search" class="text-gray-600 hover:text-blue-600">Product Search</a>
+                    <a href="/company-search" class="text-gray-600 hover:text-blue-600">Company Search</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="pt-24 pb-12 px-4">
+        <div class="max-w-6xl mx-auto">
+            <!-- Company Header with Metadata -->
+            <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+                <h1 class="text-3xl font-bold mb-8 gradient-text text-center">{{ company_url }}</h1>
+
+                <!-- Company Metadata -->
+                <div class="rounded-xl p-6">
+                    {{ insights.tasks_output.tasks_output[0] | safe }}  <!-- Metadata output -->
+                </div>
+            </div>
+
+            <!-- Analysis Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <!-- Company Strengths -->
+                <div class="bg-white rounded-xl shadow-lg p-6 card-3d">
+                    <h2 class="text-xl font-semibold mb-4 text-blue-600">
+                        Praised Features
+                    </h2>
+                    <div class="prose">
+                        {{ insights.tasks_output.tasks_output[1] | safe }}
+                    </div>
+                </div>
+
+                <!-- Pain Points -->
+                <div class="bg-white rounded-xl shadow-lg p-6 card-3d">
+                    <h2 class="text-xl font-semibold mb-4 text-rose-600">
+                        Key Challenges
+                    </h2>
+                    <div class="prose">
+                        {{ insights.tasks_output.tasks_output[2] | safe }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Strategic Recommendations -->
+            <div class="bg-white rounded-xl shadow-lg p-6 card-3d">
+                <h2 class="text-xl font-semibold mb-4 gradient-text">
+                    Strategic Recommendations
+                </h2>
+                <div class="prose max-w-none">
+                    {{ insights.tasks_output.tasks_output[3] | safe }}
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="fixed bottom-0 w-full bg-white shadow-lg-up py-4">
+        <p class="text-center text-gray-600">© 2024 Product Management Dashboard</p>
+    </footer>
+</body>
+</html>

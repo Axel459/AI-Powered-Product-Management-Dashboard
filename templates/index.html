@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Management Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .card-3d {
+            transform-style: preserve-3d;
+            transition: all 0.3s ease;
+        }
+        .card-3d:hover {
+            transform: translateY(-10px) rotateX(4deg);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #3b82f6 0%, #2dd4bf 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-50">
+    <nav class="fixed w-full z-50 bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <span class="text-xl font-bold gradient-text">Product Dashboard</span>
+                <div class="space-x-8">
+                    <a href="/product-search" class="text-gray-600 hover:text-blue-600">Product Search</a>
+                    <a href="/company-search" class="text-gray-600 hover:text-blue-600">Company Search</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="pt-32 pb-12 px-4">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-16">
+                <h1 class="text-5xl font-bold mb-8 gradient-text">
+                    Product Management Dashboard
+                </h1>
+                <p class="text-xl text-gray-600">
+                    Transform customer feedback into actionable insights
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-16">
+                <a href="/product-search"
+                   class="card-3d bg-white p-8 rounded-xl shadow-xl">
+                    <h2 class="text-2xl font-bold mb-4 text-gray-800">Product Search</h2>
+                    <p class="text-gray-600">
+                        Leverage AI to analyze product reviews and customer sentiment
+                    </p>
+                </a>
+                <a href="/company-search"
+                   class="card-3d bg-white p-8 rounded-xl shadow-xl">
+                    <h2 class="text-2xl font-bold mb-4 text-gray-800">Company Search</h2>
+                    <p class="text-gray-600">
+                        Get comprehensive insights across product portfolios
+                    </p>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="fixed bottom-0 w-full bg-white shadow-lg-up py-4">
+        <p class="text-center text-gray-600">© 2024 Product Management Dashboard</p>
+    </footer>
+</body>
+</html>

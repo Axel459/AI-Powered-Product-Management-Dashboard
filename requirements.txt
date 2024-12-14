@@ -1,0 +1,10 @@
+cs50
+Flask
+Flask-Session
+pytz
+requests
+datasets
+pandas
+openai
+crewai
+bs4

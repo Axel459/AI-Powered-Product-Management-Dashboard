@@ -1,0 +1,94 @@
+from time import sleep
+import requests
+import pandas as pd
+from bs4 import BeautifulSoup
+
+def soup2list(src, list_, attr=None):
+    """Helper function to extract data from BeautifulSoup results"""
+    if attr:
+        for val in src:
+            try:
+                list_.append(val[attr])
+            except (KeyError, TypeError):
+                list_.append(None)
+    else:
+        for val in src:
+            try:
+                list_.append(val.get_text().strip())
+            except AttributeError:
+                list_.append(None)
+
+def scrape_trustpilot_reviews(company_url: str, max_pages: int = 4, min_reviews: int = 50) -> pd.DataFrame:
+    """
+    Scrape reviews from Trustpilot
+    Args:
+        company_url: Company domain (e.g., 'apple.com')
+        max_pages: Number of pages to scrape (default 4)
+        min_reviews: Minimum number of reviews required (default 50)
+    Raises:
+        Exception: If insufficient reviews are found
+    """
+    users = []
+    ratings = []
+    locations = []
+    dates = []
+    reviews = []
+
+    try:
+        for i in range(1, max_pages + 1):
+            print(f"Scraping page {i}...")
+            result = requests.get(f"https://www.trustpilot.com/review/{company_url}?page={i}")
+
+            if result.status_code != 200:
+                if i == 1:
+                    raise Exception(f"Failed to access Trustpilot page. Status code: {result.status_code}")
+                break
+
+            soup = BeautifulSoup(result.content, 'html.parser')
+
+            # Extract data
+            soup2list(
+                soup.find_all('span', {'class': 'typography_heading-xxs__QKBS8 typography_appearance-default__AAY17'}),
+                users
+            )
+            soup2list(
+                soup.find_all('div', {'class': 'typography_body-m__xgxZ_ typography_appearance-subtle__8_H2l styles_detailsIcon__Fo_ua'}),
+                locations
+            )
+            soup2list(
+                soup.find_all('div', {'class': 'styles_reviewHeader__iU9Px'}),
+                dates
+            )
+            soup2list(
+                soup.find_all('div', {'class': 'styles_reviewHeader__iU9Px'}),
+                ratings,
+                attr='data-service-review-rating'
+            )
+            soup2list(
+                soup.find_all('div', {'class': 'styles_reviewContent__0Q2Tg'}),
+                reviews
+            )
+
+            sleep(1)
+
+        if not users:  # If no reviews were found
+            raise Exception("No reviews found for this company")
+
+        # Create DataFrame
+        review_data = pd.DataFrame({
+            'Username': users,
+            'location': locations,
+            'date': dates,
+            'review': reviews,
+            'rating': ratings
+        })
+
+        # Check if we have enough reviews
+        if len(review_data) < min_reviews:
+            raise InsufficientReviewsError(f"Found {len(review_data)} reviews, but {min_reviews} are required.")
+
+        print(f"Successfully scraped {len(review_data)} reviews")
+        return review_data
+
+    except Exception as e:
+        raise Exception(f"Error scraping reviews: {str(e)}")
