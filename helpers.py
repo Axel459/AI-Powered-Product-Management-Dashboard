@@ -4,7 +4,7 @@ import sqlite3
 from typing import List, Dict
 import os
 
-os.environ['OPENAI_API_KEY'] = "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"
+os.environ['OPENAI_API_KEY'] = ""
 os.environ["OPENAI_MODEL_NAME"] = 'gpt-4o-mini'
 
 def get_db_connection():
