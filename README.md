@@ -4,6 +4,8 @@ This web-based dashboard leverages AI to analyze customer reviews and provide ac
 Video Demo: https://www.youtube.com/watch?v=X_eu3lVCRuM
 Dataset: https://drive.google.com/drive/folders/1gCffjeO4RkLnoN2-VIEOC9e4zlo1zcz-?usp=sharing
 
+An OpenAI API key needs to be imported into helpers to enable the AI agents to run.
+
 ## Features
 The application has two main features:
 
@@ -41,7 +43,7 @@ The application includes error handling for:
 
 
 ## Limitations and Considerations
-* The application runs on an OpenAI API key with a limited budget. For scaling up, another API key is needed
+* An OpenAI API key needs to be imported into helpers to enable the AI agents to run.
 * The MVP of the Product search is limited to electronic products in the Amazon Reviews database
 * Company search requires the company to have at least 4 pages of Trustpilot reviews
 * Analysis time varies based on the number of reviews

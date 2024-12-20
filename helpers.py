@@ -3,8 +3,9 @@ from crewai import Agent, Task, Crew, Process
 import sqlite3
 from typing import List, Dict
 import os
+from key import open_ai 
 
-os.environ['OPENAI_API_KEY'] = ""
+os.environ['OPENAI_API_KEY'] = open_ai
 os.environ["OPENAI_MODEL_NAME"] = 'gpt-4o-mini'
 
 def get_db_connection():
