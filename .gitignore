@@ -8,6 +8,9 @@ venv/
 # Database
 *.db
 
+# Key
+key.py
+
 # VS Code
 .vscode/
 
