@@ -8,3 +8,4 @@ pandas
 openai
 crewai
 bs4
+gunicorn
