@@ -1,11 +1,14 @@
-from helpers import analyze_product_reviews, get_db_connection, analyze_company_reviews, clean_company_url
+from helpers import analyze_product_reviews, get_db_connection, analyze_company_reviews, clean_company_url, download_database
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 import uuid
+import os
 from threading import Thread
 import time
 import traceback
 from beautifulscraper import scrape_trustpilot_reviews
 
+if not os.path.exists('amazon_reviews_drive.db'):
+    download_database()
 
 app = Flask(__name__)
 

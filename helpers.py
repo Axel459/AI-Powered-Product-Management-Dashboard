@@ -4,6 +4,9 @@ import sqlite3
 from typing import List, Dict
 import os
 from key import open_ai 
+import requests
+import re
+import gdown
 
 os.environ['OPENAI_API_KEY'] = open_ai
 os.environ["OPENAI_MODEL_NAME"] = 'gpt-4o-mini'
@@ -12,7 +15,7 @@ def get_db_connection():
     """
     Establish a connection to the SQLite database
     """
-    conn = sqlite3.connect('amazon_reviews_filtered.db')
+    conn = sqlite3.connect('amazon_reviews_drive.db')
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -23,7 +26,7 @@ def get_reviews_for_product(product_title: str, limit: int = 50) -> List[Dict]:
     1. Find the parent_asin from metadata table using the product title
     2. Use the parent_asin to find all related reviews
     """
-    conn = sqlite3.connect('amazon_reviews_filtered.db')
+    conn = sqlite3.connect('amazon_reviews_drive.db')
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -507,3 +510,19 @@ def clean_company_url(url: str) -> str:
     url = url.split('/')[0]
 
     return url.strip()
+
+
+def download_database():
+    """Download database using gdown"""
+    try:
+        
+        print("Downloading database...")
+        file_id = "1Lmm1-X6c_hhwFnlAURyIBKgZIw-JROyp"
+        url = f"https://drive.google.com/uc?id={file_id}"
+        output = "amazon_reviews_drive.db"
+        
+        gdown.download(url, output, quiet=False)
+        print("Database downloaded successfully!")
+    except Exception as e:
+        print(f"Error downloading database: {str(e)}")
+        raise

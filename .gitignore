@@ -6,7 +6,7 @@ myvenv/
 .env
 
 # Database
-*.db
+#*.db
 
 # Key
 key.py

@@ -1,4 +1,3 @@
-cs50
 Flask
 Flask-Session
 pytz
@@ -8,4 +7,5 @@ pandas
 openai
 crewai
 bs4
-gunicorn
+gunicorn==20.1.0
+gdown==4.7.1
