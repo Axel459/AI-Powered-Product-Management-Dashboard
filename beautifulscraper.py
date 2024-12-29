@@ -18,6 +18,10 @@ def soup2list(src, list_, attr=None):
             except AttributeError:
                 list_.append(None)
 
+class InsufficientReviewsError(Exception):
+    """Custom error for when there aren't enough reviews"""
+    pass                
+
 def scrape_trustpilot_reviews(company_url: str, max_pages: int = 4, min_reviews: int = 50) -> pd.DataFrame:
     """
     Scrape reviews from Trustpilot
@@ -41,7 +45,7 @@ def scrape_trustpilot_reviews(company_url: str, max_pages: int = 4, min_reviews:
 
             if result.status_code != 200:
                 if i == 1:
-                    raise Exception(f"Failed to access Trustpilot page. Status code: {result.status_code}")
+                    raise Exception(f"Failed to find URL on Trustpilot, please use alternative URL or search for another company. Status code: {result.status_code}")
                 break
 
             soup = BeautifulSoup(result.content, 'html.parser')
@@ -85,10 +89,14 @@ def scrape_trustpilot_reviews(company_url: str, max_pages: int = 4, min_reviews:
 
         # Check if we have enough reviews
         if len(review_data) < min_reviews:
-            raise InsufficientReviewsError(f"Found {len(review_data)} reviews, but {min_reviews} are required.")
+            raise InsufficientReviewsError(
+                f"Found {len(review_data)} reviews, but {min_reviews} are required. "
+                "Please try searching for an alternative URL on trustpilot.com or search for another company."
+            )
 
-        print(f"Successfully scraped {len(review_data)} reviews")
         return review_data
 
     except Exception as e:
+        if isinstance(e, InsufficientReviewsError):
+            raise
         raise Exception(f"Error scraping reviews: {str(e)}")

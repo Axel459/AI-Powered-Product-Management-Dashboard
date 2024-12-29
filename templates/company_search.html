@@ -104,45 +104,22 @@
             const form = document.getElementById('company-search-form');
             const loadingOverlay = document.getElementById('loading-overlay');
 
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const companyUrl = document.getElementById('company-url').value.trim();
-
-                // Basic validation
-                if (!companyUrl || !companyUrl.includes('.')) {
-                    alert('Please enter a valid company website');
-                    return;
-                }
-
-                loadingOverlay.classList.remove('hidden');
-
-                try {
-                    const response = await axios.post('/analyze-company', {
-                        company_url: companyUrl
-                    });
-
-                    // Start polling for analysis status
-                    const taskId = response.data.task_id;
-                    await pollAnalysisStatus(taskId, companyUrl);
-                } catch (error) {
-                    console.error('Error:', error);
-                    alert('An error occurred while analyzing the company. Please try again.');
-                    loadingOverlay.classList.add('hidden');
-                }
-            });
-
+            // Unified polling function
             async function pollAnalysisStatus(taskId, companyUrl) {
+                const maxAttempts = 90; // 3 minutes with 2-second intervals
                 let attempts = 0;
-                const maxAttempts = 90; // 3 minutes
 
                 while (attempts < maxAttempts) {
                     try {
                         const statusResponse = await axios.get(`/check-analysis-status/${taskId}`);
-
+                        
                         if (statusResponse.data.status === 'completed') {
                             window.location.href = `/company-insights/${encodeURIComponent(companyUrl)}`;
                             return;
                         } else if (statusResponse.data.status === 'failed') {
+                            if (statusResponse.data.error && statusResponse.data.error.includes('InsufficientReviewsError')) {
+                                throw new Error('There are not enough reviews for the selected URL on Trustpilot. Check for an alternative URL on trustpilot.com or search for another company.');
+                            }
                             throw new Error(statusResponse.data.error || 'Analysis failed');
                         }
 
@@ -153,8 +130,43 @@
                     }
                 }
 
-                throw new Error('Analysis timed out');
+                throw new Error('Analysis timed out after 3 minutes');
             }
+
+            // Unified analysis handler
+            async function handleAnalysis(companyUrl) {
+                loadingOverlay.classList.remove('hidden');
+                
+                try {
+                    const response = await axios.post('/analyze-company', {
+                        company_url: companyUrl
+                    });
+
+                    await pollAnalysisStatus(response.data.task_id, companyUrl);
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert(error.message || 'An error occurred while analyzing the company. Please try again.');
+                    loadingOverlay.classList.add('hidden');
+                }
+            }
+
+            // Form submit handler
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const companyUrl = document.getElementById('company-url').value.trim();
+
+                if (!companyUrl || !companyUrl.includes('.')) {
+                    alert('Please enter a valid company website');
+                    return;
+                }
+
+                await handleAnalysis(companyUrl);
+            });
+
+            // Product selection handler
+            window.handleProductSelection = async (suggestion) => {
+                await handleAnalysis(suggestion);
+            };
         });
     </script>
 

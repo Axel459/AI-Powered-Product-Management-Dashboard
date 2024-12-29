@@ -1,14 +1,11 @@
-from helpers import analyze_product_reviews, get_db_connection, analyze_company_reviews, clean_company_url, download_database
+from helpers import analyze_product_reviews, get_db_connection, analyze_company_reviews, clean_company_url
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 import uuid
-import os
 from threading import Thread
 import time
 import traceback
-from beautifulscraper import scrape_trustpilot_reviews
+from beautifulscraper import scrape_trustpilot_reviews, InsufficientReviewsError
 
-if not os.path.exists('amazon_reviews_drive.db'):
-    download_database()
 
 app = Flask(__name__)
 
@@ -44,8 +41,8 @@ def get_product_suggestions():
     """
     query = request.args.get('query', '')
 
-    # Only search if query is at least 3 characters long
-    if len(query) < 3:
+    # Only search if query is at least 2 characters long
+    if len(query) < 2:
         return jsonify([])
 
     conn = get_db_connection()
@@ -278,6 +275,15 @@ def run_company_analysis(task_id: str, company_url: str):
         }
 
         print(f"Analysis completed for task {task_id}")
+
+    except InsufficientReviewsError as e:
+        print(f"Insufficient reviews for task {task_id}: {str(e)}")
+        analysis_tasks[task_id] = {
+            'status': 'failed',
+            'error': str(e),
+            'company_url': company_url,
+            'timestamp': time.time()
+        }
 
     except Exception as e:
         print(f"Analysis failed for task {task_id}: {str(e)}")

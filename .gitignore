@@ -5,11 +5,14 @@ __pycache__/
 myvenv/
 .env
 
-# Database
-#*.db
+# Larger Database
+amazon_reviews_filtered.db
 
 # Key
 key.py
+
+# tests
+fix.py
 
 # VS Code
 .vscode/
