@@ -1,10 +1,8 @@
 # The Product Management Dashboard
 This web-based dashboard leverages AI to analyze customer reviews and provide actionable product and business development insights for product managers and business analysts. The application offers two main functionalities: Product Search and Company Search, each providing detailed analysis using large language models.
 
-Video Demo: https://www.youtube.com/watch?v=X_eu3lVCRuM
-Dataset: https://drive.google.com/drive/folders/1gCffjeO4RkLnoN2-VIEOC9e4zlo1zcz-?usp=sharing
-
-An OpenAI API key needs to be imported into helpers to enable the AI agents to run.
+Demo Webapp: https://ai-powered-product-management-dashboard.onrender.com/
+Demo Video: https://www.youtube.com/watch?v=X_eu3lVCRuM
 
 ## Features
 The application has two main features:
@@ -27,6 +25,7 @@ To use the company search function, the user inputs a company's URL to generate 
 * Python 3.8 or higher
 * pip package manager
 * Installation of required packages: pip install -r requirements.txt
+* Importing an OpenAI API key into helpers.py to enable the AI agents to run.
 
 ### Launch
 * Run the flask application: python app.py
@@ -44,7 +43,7 @@ The application includes error handling for:
 
 ## Limitations and Considerations
 * An OpenAI API key needs to be imported into helpers to enable the AI agents to run.
-* The MVP of the Product search is limited to electronic products in the Amazon Reviews database
+* The MVP of the Product search is limited to electronic products popular in 2023 from the Amazon Reviews database
 * Company search requires the company to have at least 4 pages of Trustpilot reviews
 * Analysis time varies based on the number of reviews
 
@@ -52,6 +51,9 @@ The application includes error handling for:
 * Upload proprietary company review data to adapt product search to any product
 * Increase amount of reviews to be analyzed to optimize output
 * Implement more AI agents to generate more insights. For example: Pricing feedback, trends over time following feature implentation, identifying SEO keywords related to customer language, market insights, analyze competitors' reviews for market insights and differentiation.
+
+## References
+
 
 ## Support
 * In case of issues or quesitons, feel free to reach out to axel.svensson@yale.edu
