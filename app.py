@@ -268,7 +268,7 @@ def run_company_analysis(task_id: str, company_url: str):
                 'tasks_output': analysis_results,  # This should be the CrewAI output
                 'reviews': reviews_df.to_dict('records'),
                 'reviews_count': len(reviews_df),
-                'average_rating': round(reviews_df['rating'].astype(float).mean(), 2)
+                #'average_rating': round(reviews_df['rating'].astype(float).mean(), 2)
             },
             'company_url': company_url,
             'timestamp': time.time()

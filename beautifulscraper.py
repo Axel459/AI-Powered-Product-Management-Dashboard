@@ -52,39 +52,17 @@ def scrape_trustpilot_reviews(company_url: str, max_pages: int = 4, min_reviews:
 
             # Extract data
             soup2list(
-                soup.find_all('span', {'class': 'typography_heading-xxs__QKBS8 typography_appearance-default__AAY17'}),
-                users
-            )
-            soup2list(
-                soup.find_all('div', {'class': 'typography_body-m__xgxZ_ typography_appearance-subtle__8_H2l styles_detailsIcon__Fo_ua'}),
-                locations
-            )
-            soup2list(
-                soup.find_all('div', {'class': 'styles_reviewHeader__iU9Px'}),
-                dates
-            )
-            soup2list(
-                soup.find_all('div', {'class': 'styles_reviewHeader__iU9Px'}),
-                ratings,
-                attr='data-service-review-rating'
-            )
-            soup2list(
-                soup.find_all('div', {'class': 'styles_reviewContent__0Q2Tg'}),
+                soup.find_all('div', {'class': 'styles_reviewContent__44s_M'}),
                 reviews
             )
-
             sleep(1)
 
-        if not users:  # If no reviews were found
+        if not reviews:  # If no reviews were found
             raise Exception("No reviews found for this company")
 
         # Create DataFrame
         review_data = pd.DataFrame({
-            'Username': users,
-            'location': locations,
-            'date': dates,
-            'review': reviews,
-            'rating': ratings
+            'review': reviews
         })
 
         # Check if we have enough reviews
