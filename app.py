@@ -254,27 +254,25 @@ def run_company_analysis(task_id: str, company_url: str):
     """
     try:
         print(f"Starting analysis for task {task_id}: {company_url}")
-
-        # Step 1: Scrape reviews
+        
+        # Debug print
+        print("Current tasks:", analysis_tasks)
+        
         reviews_df = scrape_trustpilot_reviews(company_url)
-
-        # Step 2: Run analysis
         analysis_results = analyze_company_reviews(company_url, reviews_df)
-
-        # Store results
+        
+        # Store results and debug print
         analysis_tasks[task_id] = {
             'status': 'completed',
             'result': {
-                'tasks_output': analysis_results,  # This should be the CrewAI output
+                'tasks_output': analysis_results,
                 'reviews': reviews_df.to_dict('records'),
                 'reviews_count': len(reviews_df),
-                #'average_rating': round(reviews_df['rating'].astype(float).mean(), 2)
             },
             'company_url': company_url,
             'timestamp': time.time()
         }
-
-        print(f"Analysis completed for task {task_id}")
+        print(f"Task {task_id} completed. Updated tasks:", analysis_tasks)
 
     except InsufficientReviewsError as e:
         print(f"Insufficient reviews for task {task_id}: {str(e)}")
@@ -301,19 +299,26 @@ def company_insights(company_url):
     Display company insights
     """
     print(f"Fetching insights for company: {company_url}")
-
+    print("Available tasks:", analysis_tasks)
+    
+    # Clean the company URL to ensure matching
+    company_url = clean_company_url(company_url)
+    
     matching_tasks = [
         task for task in analysis_tasks.values()
         if task.get('status') == 'completed' and
-        task.get('company_url') == company_url
+        clean_company_url(task.get('company_url', '')) == company_url
     ]
-
+    
+    print(f"Matching tasks found: {len(matching_tasks)}")
+    
     if not matching_tasks:
         print(f"No completed analysis found for: {company_url}")
         return redirect(url_for('company_search'))
 
     task = max(matching_tasks, key=lambda x: x.get('timestamp', 0))
-
+    print(f"Selected task status: {task.get('status')}")
+    
     return render_template('company_insights.html',
                          company_url=company_url,
                          insights=task['result'])
